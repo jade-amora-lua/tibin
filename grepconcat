@@ -1,0 +1,50 @@
+#!/bin/bash
+#set -x
+
+if [ -z "$1" ]
+then
+    echo "grepconcat: $0 [grep-options] file -- [patterns]"
+    echo "Look for lines containing all patterns."
+    echo "Quick way to do 'grep pat1 | grep pat2 | grep pat3'"
+    exit 0
+fi
+
+# Define vars
+ARGS=""
+PATTERN=""
+FILE=""
+LAST=""
+
+# Parse command-line arguments
+CONTINUE=1
+while {
+    [ ! -z "$1" ] && [ $CONTINUE -eq 1 ]
+}
+do
+    case "$1" in
+        "--")
+            CONTINUE=0
+            ;;
+        *)
+            ARGS="${ARGS} ${LAST}"
+            LAST="$1"
+            ;;
+    esac
+    shift
+done
+FILE="${LAST}"
+
+# Remaining arguments are patterns. We take the first one.
+PATTERN="$1"
+shift
+
+if [ "x" = "x$PATTERN" ]
+then
+    # If there is no pattern, cat the file.
+    cat "$FILE"
+    exit 0
+else
+    # Pass the other patterns to a new instance of grepconcat and grep
+    # for the first one.
+    "$0" $ARGS "$FILE" -- "$@" | grep $ARGS "$PATTERN"
+fi
