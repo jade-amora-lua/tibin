@@ -4,62 +4,57 @@ import urllib.request
 import urllib.parse
 from bs4 import BeautifulSoup
 
-search_param = [
-    ("edicao.ano", "2015"),
-    ("edicao.dtFim", "10/04"),
-    ("edicao.dtInicio", "10/04"),
-    ("edicao.fonetica", "null") ,
-    ("edicao.jornal",
-     "1,1000,1010,1020,2,2000,3,3000,3020,4000,5000,6000,126,4,5,6,20,21,"),
-    ( "edicao.jornal_hidden", ""),
-    ("edicao.paginaAtual", "1"),
-    ("edicao.tipoPesquisa", "pesquisa_avancada"),
-    ("edicao.txtPesquisa", "saboga")]
+DEFAULT_ARGS = ("2015",
+                "10/04",
+                "10/04",
+                "null",
+                "1,1000,1010,1020,2,2000,3,3000,3020,4000,5000,6000,126,4,5,6,20,21,",
+                "",
+                "1",
+                "pesquisa_avancada",
+                "exteriores")
 
-url = "http://pesquisa.in.gov.br/imprensa/core/consulta.action"
+class ImprensaNacional(object):
 
-postdata = urllib.parse.urlencode(search_param).encode('ascii')
+    def __init__(self, ano, fim, inicio,
+               fonetica, jornal, jornal_hidden,
+               paginaAtual, tipoPesquisa, txtPesquisa):
+        self.url = "http://pesquisa.in.gov.br/imprensa/core/consulta.action"
+        self.search_params = [
+            ("edicao.ano", ano),
+            ("edicao.dtFim", fim),
+            ("edicao.dtInicio", inicio),
+            ("edicao.fonetica", fonetica),
+            ("edicao.jornal", jornal),
+            ("edicao.jornal_hidden", jornal_hidden),
+            ("edicao.paginaAtual", paginaAtual),
+            ("edicao.tipoPesquisa", tipoPesquisa),
+            ("edicao.txtPesquisa", txtPesquisa)]
 
-# retrieve file-like object with search results
-page = urllib.request.urlopen(url, postdata)
+    def search(self):
+        postdata = urllib.parse.urlencode(self.search_params).encode('ascii')
+        pageread = urllib.request.urlopen(self.url, postdata).read()
+        page = pageread.decode("utf-8")
+        soup = BeautifulSoup(page[-5000:])
+        paginacao = soup.find(id="paginacao")
+        # First substring of paginacao:
+        results_description = next(paginacao.span.strings)
 
-# special methodos of the urllib-generated object
+        # First word of results:
+        word = results_description.split()[0]
 
-# has the link been redirected?
-# new_url = page.geturl()
+        if word == "Nenhum":
+            self.numberofresults = 0
+        else:
+            try:
+                self.numberofresults = int(word)
+            except:
+                print("Error converting number of results: %s" % word)
 
-# what meta information did we receive?
-meta = page.info()
+imprensa = ImprensaNacional(*DEFAULT_ARGS)
 
-pageread = page.read()
-
-page = pageread.decode("utf-8")
-
-with open("/tmp/dou-astext-003.txt", 'w') as astextwrite:
-    astextwrite.write(page)
-
-
-# ugly hack: the page we received is composed of two html trees, so we
-# grab only the last 1000 bytes
-soup = BeautifulSoup(page[-1000:])
-
-paginacao = soup.find(id="paginacao")
-
-# First substring of paginacao:
-results_description = next(paginacao.span.strings)
-
-# First word of results:
-word = results_description.split()[0]
-
-if word == "Nenhum":
-    numberofresults = 0
-else:
-    try:
-        numberofresults = int(word)
-    except:
-        print("Error converting number of results: %s" % word)
-
-print("Número de resultados: %d" % numberofresults)
+imprensa.search()
+print(imprensa.numberofresults)
 
 # This is how an empty page looks
 # <div id="paginacao">
