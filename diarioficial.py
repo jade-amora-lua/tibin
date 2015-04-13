@@ -105,30 +105,38 @@ def getoptions():
     
 
 def normalize_date(date):
-    datelist = date.split('/')
-    if len(datelist) == 2:
-        datelist.append(datetime.date.today().year)
-    if len(datelist) == 3:
-        try:
-            day, month, year = [ int(x) for x in datelist ]
-        except:
-            print("Error converting date %s." % date)
-            raise
+    if not date:
+        today = datetime.date.today()
+        day, month, year = today.day, today.month, today.year
+    else:
+        datelist = date.split('/')
+        if len(datelist) == 2:
+            datelist.append(0)
+        if len(datelist) == 3:
+            try:
+                day, month, year = [ int(x) for x in datelist ]
+            except:
+                print("Error converting date %s." % date)
+                raise
     return ("%02d/%02d" % (day, month), "%4d" % year)
     
 def main():
     opts = getoptions()
 
-    if opts.datainicio:
-        inicio, ano = normalize_date(opts.datainicio)
-        DEFAULT_ARGS['inicio'] = inicio
-        DEFAULT_ARGS['ano'] = ano
+    inicio, anoinicio = normalize_date(opts.datainicio)
+    DEFAULT_ARGS['inicio'] = inicio
 
-    if opts.datafim:
-        fim, ano = normalize_date(opts.datainicio)
-        DEFAULT_ARGS['fim'] = fim
-        DEFAULT_ARGS['ano'] = ano
+    fim, anofim = normalize_date(opts.datafim)
+    DEFAULT_ARGS['fim'] = fim
 
+    if int(anofim):
+        ano = anofim
+    elif int(anoinicio):
+        ano = anoinicio
+    else:
+        ano = "%4d" % datetime.date.today().year
+    DEFAULT_ARGS['ano'] = ano
+        
     if opts.busca:
         DEFAULT_ARGS['txtPesquisa'] = ' '.join(opts.busca)
         
