@@ -1,0 +1,136 @@
+* To understand
+
+
+
+- See example-client.py and example-service.py
+
+* dbus signals when connection usb stick (with dbus-monitor)
+signal sender=:1.419 -> dest=(null destination) serial=20 path=/org/freedesktop/UDisks; interface=org.freedesktop.UDisks; member=DeviceAdded
+   object path "/org/freedesktop/UDisks/devices/sdb"
+signal sender=:1.410 -> dest=(null destination) serial=170 path=/org/freedesktop/UDisks2; interface=org.freedesktop.DBus.ObjectManager; member=InterfacesAdded
+   object path "/org/freedesktop/UDisks2/drives/Lexar_USB_Flash_Drive_AA95BA6ORWWKIB8O"
+   array [
+      dict entry(
+         string "org.freedesktop.UDisks2.Drive"
+         array [
+            dict entry(
+               string "Vendor"
+               variant                   string "Lexar"
+            )
+            dict entry(
+               string "Model"
+               variant                   string "USB Flash Drive"
+            )
+            dict entry(
+               string "Revision"
+               variant                   string "1100"
+            )
+            dict entry(
+               string "Serial"
+               variant                   string "AA95BA6ORWWKIB8O"
+            )
+            dict entry(
+               string "WWN"
+               variant                   string ""
+            )
+            dict entry(
+               string "Id"
+               variant                   string "Lexar-USB-Flash-Drive-AA95BA6ORWWKIB8O"
+            )
+            dict entry(
+               string "Configuration"
+               variant                   array [
+                  ]
+            )
+            dict entry(
+               string "Media"
+               variant                   string ""
+            )
+            dict entry(
+               string "MediaCompatibility"
+               variant                   array [
+                  ]
+            )
+            dict entry(
+               string "MediaRemovable"
+               variant                   boolean true
+            )
+            dict entry(
+               string "MediaAvailable"
+               variant                   boolean true
+            )
+            dict entry(
+               string "MediaChangeDetected"
+               variant                   boolean true
+            )
+            dict entry(
+               string "Size"
+               variant                   uint64 64019759104
+            )
+            dict entry(
+               string "TimeDetected"
+               variant                   uint64 1427681920356786
+            )
+            dict entry(
+               string "TimeMediaDetected"
+               variant                   uint64 1427681920356786
+            )
+            dict entry(
+               string "Optical"
+               variant                   boolean false
+            )
+            dict entry(
+               string "OpticalBlank"
+               variant                   boolean false
+            )
+            dict entry(
+               string "OpticalNumTracks"
+               variant                   uint32 0
+            )
+            dict entry(
+               string "OpticalNumAudioTracks"
+               variant                   uint32 0
+            )
+            dict entry(
+               string "OpticalNumDataTracks"
+               variant                   uint32 0
+            )
+            dict entry(
+               string "OpticalNumSessions"
+               variant                   uint32 0
+            )
+            dict entry(
+               string "RotationRate"
+               variant                   int32 -1
+            )
+            dict entry(
+               string "ConnectionBus"
+               variant                   string "usb"
+            )
+            dict entry(
+               string "Seat"
+               variant                   string "seat0"
+            )
+            dict entry(
+               string "Removable"
+               variant                   boolean true
+            )
+            dict entry(
+               string "Ejectable"
+               variant                   boolean true
+            )
+            dict entry(
+               string "SortKey"
+               variant                   string "01hotplug/1427681920356786"
+            )
+            dict entry(
+               string "CanPowerOff"
+               variant                   boolean true
+            )
+            dict entry(
+               string "SiblingId"
+               variant                   string "/sys/devices/pci0000:00/0000:00:1d.7/usb1/1-6/1-6:1.0"
+            )
+         ]
+      )
+   ]
