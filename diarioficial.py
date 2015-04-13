@@ -5,6 +5,11 @@ import urllib.parse
 from bs4 import BeautifulSoup
 import argparse
 import datetime
+import sys
+import subprocess
+import os.path
+import shutil
+import re
 
 DEFAULT_ARGS = {"ano": "2015",
                 "fim": "13/04",
@@ -90,6 +95,40 @@ class ImprensaNacional(object):
             results.append((link, link_description, excerpt))
         return(results)
 
+    def getpdf(self, result):
+        link, description, excerpt = result
+        
+        direction = link.split('?')[1]
+        basepath = "http://pesquisa.in.gov.br/imprensa/servlet/INPDFViewer?"
+        addendum = "&captchafield=firistAccess"
+        fulllink = basepath + direction + addendum
+
+        page = urllib.request.urlopen(fulllink)
+
+        localpath = "/tmp"
+        localname = slugify(description)
+        localext = ".pdf"
+        localfqn = os.path.join(localpath, localname + localext)
+
+        if os.path.exists(localfqn):
+            print("File exists. Aborting.")
+        else:
+            with open(localfqn, "bw") as writefile:
+                shutil.copyfileobj(page, writefile)
+        return localfqn
+
+
+def slugify(value):
+    """
+    Normalizes string, converts to lowercase, removes non-alpha characters,
+    and converts spaces to hyphens.
+    """
+    import unicodedata
+    value = unicodedata.normalize('NFKD', value).encode('ascii', 'ignore').decode('ascii')
+    value = re.sub('[^\w\s-]', '', value).strip().lower()
+    value = re.sub('[-\s]+', '-', value)
+    return value
+
 
 def getoptions():
     parser = argparse.ArgumentParser(description="Pesquisar no Diário Oficial.")
@@ -142,13 +181,31 @@ def main():
         
     imprensa = ImprensaNacional(**DEFAULT_ARGS)
 
-    messages = [ "Number of results: %d." % imprensa.numberofresults ]
-    for link, link_description, excerpt in imprensa.results:
-        message = "Link: %s.\n" % link
+    messages = [ "Número de resultados: %d." % imprensa.numberofresults ]
+    for i, (link, link_description, excerpt) in enumerate(imprensa.results):
+        message = "Número: %d.\n" % i
+        message += "Link: %s.\n" % link
         message += "Link description: %s.\n\n" % link_description
         message += "Excerpt: %s." % excerpt
         messages.append(message)
     print("\n===========\n".join(messages))
+
+    if imprensa.numberofresults = 0:
+        sys.exit(0)
+    
+    while 1:
+        print("Escolha um dos resultados para visualizar, ou enter para sair.")
+        choice = input("> ")
+        if choice == "":
+            break
+        else:
+            choice = int(choice)
+        filename = imprensa.getpdf(imprensa.results[choice])
+        print("Abrindo arquivo %s." % filename)
+        if sys.platform.startswith('linux'):
+            subprocess.call(['xdg-open', filename])
+        else:
+            subprocess.call(['start', filename])
 
 if __name__ == "__main__":
     main()
