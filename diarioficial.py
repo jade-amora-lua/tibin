@@ -140,6 +140,9 @@ def getoptions():
                        help="Data final para busca.")
     parser.add_argument('busca', nargs='+',
                         help="Termos para busca.")
+    parser.add_argument('--scripting', '-s', action="store_false",
+                        help="Não entrar no modo interativo. Use esse modo para "
+                        "usar a saída em outros programas.")
     return parser.parse_args()
     
 
@@ -190,22 +193,22 @@ def main():
         messages.append(message)
     print("\n===========\n".join(messages))
 
-    if imprensa.numberofresults = 0:
-        sys.exit(0)
-    
-    while 1:
-        print("Escolha um dos resultados para visualizar, ou enter para sair.")
-        choice = input("> ")
-        if choice == "":
-            break
-        else:
-            choice = int(choice)
-        filename = imprensa.getpdf(imprensa.results[choice])
-        print("Abrindo arquivo %s." % filename)
-        if sys.platform.startswith('linux'):
-            subprocess.call(['xdg-open', filename])
-        else:
-            subprocess.call(['start', filename])
+    if imprensa.numberofresults == 0:
+        sys.exit(1)
+    elif opts.scripting:
+        while 1:
+            print("Escolha um dos resultados para visualizar, ou enter para sair.")
+            choice = input("> ")
+            if choice == "":
+                break
+            else:
+                choice = int(choice)
+            filename = imprensa.getpdf(imprensa.results[choice])
+            print("Abrindo arquivo %s." % filename)
+            if sys.platform.startswith('linux'):
+                subprocess.call(['xdg-open', filename])
+            else:
+                subprocess.call(['start', filename])
 
 if __name__ == "__main__":
     main()
